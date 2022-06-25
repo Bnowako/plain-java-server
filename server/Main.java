@@ -1,3 +1,6 @@
+package server;
+import server.http.HttpMessageParserTest;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -9,6 +12,7 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        test();
         ServerSocket socket = initSocket();
 
         while (true) {
@@ -22,10 +26,10 @@ public class Main {
         try {
             System.out.printf("Trying to read on new socket - thread: %s\n", Thread.currentThread().getName());
             BufferedInputStream bufferedInputStream = new BufferedInputStream(s.getInputStream());
-            byte[] bytes = new byte[256];
+            byte[] bytes = new byte[4096];
             var bytesCount = bufferedInputStream.read(bytes);
             var message = new String(Arrays.copyOfRange(bytes, 0, bytesCount));
-            System.out.printf("Read message: %s on socket %s\n", message, s.getPort());
+            System.out.printf("Read message:\n%s\n on socket %s\n", message, s.getPort());
 
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream());
             bufferedOutputStream.write("Success".getBytes());
@@ -43,5 +47,8 @@ public class Main {
         return socket;
     }
 
-
+    private static void test() {
+        HttpMessageParserTest httpMessageParserTest = new HttpMessageParserTest();
+        httpMessageParserTest.test();
+    }
 }
