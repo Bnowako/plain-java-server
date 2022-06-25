@@ -1,2 +1,6 @@
 # Plain java server
-Moscicki rulez
+Fun repo to learn and demystify framework magic.
+
+---
+
+Plain java magic
