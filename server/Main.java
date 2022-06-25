@@ -1,5 +1,7 @@
 package server;
+
 import server.http.HttpMessageParserTest;
+import server.http.HttpResponseFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -32,7 +34,7 @@ public class Main {
             System.out.printf("Read message:\n%s\n on socket %s\n", message, s.getPort());
 
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream());
-            bufferedOutputStream.write("Success".getBytes());
+            bufferedOutputStream.write(HttpResponseFactory.getOkResponse().toString().getBytes());
             bufferedOutputStream.flush();
 
             s.close();
