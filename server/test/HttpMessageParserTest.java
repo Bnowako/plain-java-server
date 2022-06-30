@@ -1,6 +1,8 @@
-package server.http;
+package server.test;
 
-import server.test.Test;
+import server.http.HttpMessage;
+import server.http.HttpMessageParser;
+import server.http.HttpMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
 import static server.test.TestUtils.assertEquals;
 import static server.test.TestUtils.assertNotNull;
 
-
+@TestClass
 public class HttpMessageParserTest {
 
     String exampleMessage = "GET /lyrics-wizard HTTP/1.1\n" +

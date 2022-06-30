@@ -1,6 +1,5 @@
 package server;
 
-import server.http.HttpMessageParserTest;
 import server.http.HttpResponseFactory;
 
 import java.io.BufferedInputStream;
@@ -14,7 +13,6 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        test();
         ServerSocket socket = initSocket();
 
         while (true) {
@@ -47,10 +45,5 @@ public class Main {
         var socket = new ServerSocket();
         socket.bind(new InetSocketAddress(8080));
         return socket;
-    }
-
-    private static void test() {
-        HttpMessageParserTest httpMessageParserTest = new HttpMessageParserTest();
-        httpMessageParserTest.test();
     }
 }
