@@ -33,7 +33,7 @@ public class Main {
     private static void test() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         Set<String> paths = new HashSet<>();
-        getTestClasses(Path.of("./yen/src/test"), paths);
+        getTestClasses(Path.of("./yen/test"), paths);
         paths.forEach(System.out::println);
 
         for (String classPath : paths) {
@@ -58,7 +58,7 @@ public class Main {
                 if (Files.isDirectory(p)) {
                     getTestClasses(p, paths);
                 } else if (p.getFileName().toString().endsWith(".java")) {
-                    var cleanedPath = p.toString().replace(".java", "").replace("./yen/src/test/java/", "").replace("/", ".");
+                    var cleanedPath = p.toString().replace(".java", "").replace("./", "").replace("/", ".");
                     paths.add(cleanedPath);
                 }
             });
