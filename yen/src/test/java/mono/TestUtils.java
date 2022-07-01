@@ -1,4 +1,4 @@
-package server.test;
+package mono;
 
 public class TestUtils {
     public static void assertNotNull(Object object) {

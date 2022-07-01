@@ -1,4 +1,4 @@
-package server.test;
+package mono;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -33,7 +33,7 @@ public class Main {
     private static void test() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         Set<String> paths = new HashSet<>();
-        getTestClasses(Path.of("./server/test"), paths);
+        getTestClasses(Path.of("./yen/test"), paths);
         paths.forEach(System.out::println);
 
         for (String classPath : paths) {

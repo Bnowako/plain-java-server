@@ -1,4 +1,4 @@
-package server.http;
+package mono.http;
 
 public enum HttpStatus {
     OK(200),

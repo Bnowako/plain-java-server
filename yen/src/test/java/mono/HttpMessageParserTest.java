@@ -1,14 +1,14 @@
-package server.test;
+package mono;
 
-import server.http.HttpMessage;
-import server.http.HttpMessageParser;
-import server.http.HttpMethod;
+import mono.http.HttpMessage;
+import mono.http.HttpMessageParser;
+import mono.http.HttpMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import static server.test.TestUtils.assertEquals;
-import static server.test.TestUtils.assertNotNull;
+import static mono.TestUtils.assertEquals;
+import static mono.TestUtils.assertNotNull;
 
 @TestClass
 public class HttpMessageParserTest {

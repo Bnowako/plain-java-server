@@ -1,6 +1,6 @@
-package server;
+package mono;
 
-import server.http.HttpResponseFactory;
+import mono.http.HttpResponseFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
