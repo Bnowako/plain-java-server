@@ -8,11 +8,17 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
+import java.util.*;
 
 public class Jinn {
-    public Jinn() {
+    private final Map<String, Endpoint> endpoints;
 
+    private Jinn(Map<String, Endpoint> endpoints) {
+        this.endpoints = endpoints;
+    }
+
+    public static Jinn.Builder builder() {
+        return new Jinn.Builder();
     }
 
     public void makeAWish() throws IOException {
@@ -48,5 +54,18 @@ public class Jinn {
         var socket = new ServerSocket();
         socket.bind(new InetSocketAddress(8080));
         return socket;
+    }
+
+    public static class Builder {
+        Map<String, Endpoint> endpoints = new HashMap<>();
+
+        public Jinn.Builder register(String basePath, Endpoint endpoint) {
+            endpoints.put(basePath, endpoint);
+            return this;
+        }
+
+        public Jinn build() {
+            return new Jinn(endpoints);
+        }
     }
 }
