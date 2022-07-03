@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Jinn {
     private final Map<String, Endpoint> endpoints;

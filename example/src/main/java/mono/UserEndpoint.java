@@ -8,10 +8,19 @@ class UserEndpoint implements Endpoint {
         return a;
     };
 
+    Wish getUser = (a) -> {
+        return a;
+    };
+
     @Override
-    public Map<String, Wish> wishes() {
+    public Map<String, Wish> getWishes() {
+        return Map.of("", getUser);
+    }
+
+    @Override
+    public Map<String, Wish> postWishes() {
         return Map.of(
-                "find", createUser
+                "", createUser
         );
     }
 }
