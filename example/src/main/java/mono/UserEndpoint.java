@@ -1,6 +1,6 @@
 package mono;
 
-import java.util.List;
+import java.util.Map;
 
 class UserEndpoint implements Endpoint {
 
@@ -9,9 +9,9 @@ class UserEndpoint implements Endpoint {
     };
 
     @Override
-    public List<Wish> wishes() {
-        return List.of(
-                createUser
+    public Map<String, Wish> wishes() {
+        return Map.of(
+                "find", createUser
         );
     }
 }

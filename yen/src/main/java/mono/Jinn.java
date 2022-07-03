@@ -14,6 +14,7 @@ import java.util.*;
 public class Jinn {
     private final Map<String, Endpoint> endpoints;
     private final HttpRequestParser httpRequestParser = new HttpRequestParser();
+    private final Router router = new Router();
 
     private Jinn(Map<String, Endpoint> endpoints) {
         this.endpoints = endpoints;
@@ -41,10 +42,12 @@ public class Jinn {
             byte[] bytes = new byte[4096];
             var bytesCount = bufferedInputStream.read(bytes);
             var request = httpRequestParser.parse(bytes, bytesCount);
-            System.out.printf("Read message:\n%s\n on socket %s\n", request.version, s.getPort());
+            System.out.printf("Read message:\n%s\n on socket %s\n", request.version(), s.getPort());
+
+            Object o = router.route(request, endpoints);
 
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream());
-            bufferedOutputStream.write(HttpResponseFactory.getOkResponse(request.body.orElse("No body")).toString().getBytes());
+            bufferedOutputStream.write(HttpResponseFactory.getOkResponse(o.toString()).toString().getBytes());
             bufferedOutputStream.flush();
 
             s.close();

@@ -1,7 +1,7 @@
 package mono;
 
-import java.util.List;
+import java.util.Map;
 
 interface Endpoint {
-    List<Wish> wishes();
+    Map<String, Wish> wishes();
 }

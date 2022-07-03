@@ -57,7 +57,7 @@ public class HttpRequestParserTest {
         var parser = new HttpRequestParser();
         HttpRequest parsedMessage =  parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
-        assertEquals(parsedMessage.url, "/lyrics-wizard");
+        assertEquals(parsedMessage.path, "/lyrics-wizard");
     }
 
     @Test
