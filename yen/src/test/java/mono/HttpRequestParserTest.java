@@ -1,17 +1,18 @@
 package mono;
 
-import mono.http.HttpMessage;
-import mono.http.HttpMessageParser;
+import mono.http.HttpRequest;
+import mono.http.HttpRequestParser;
 import mono.http.HttpMethod;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static mono.TestUtils.assertEquals;
 import static mono.TestUtils.assertNotNull;
 
 @TestClass
-public class HttpMessageParserTest {
+public class HttpRequestParserTest {
 
     String exampleMessage = "GET /lyrics-wizard HTTP/1.1\n" +
             "Host: 127.0.0.1:8080\n" +
@@ -36,24 +37,24 @@ public class HttpMessageParserTest {
 
     @Test
     public void parseMethod() {
-        var parser = new HttpMessageParser();
-        HttpMessage parsedMessage =  parser.parseMessage(exampleMessage);
+        var parser = new HttpRequestParser();
+        HttpRequest parsedMessage =  parser.parse(exampleMessage.getBytes(StandardCharsets.UTF_8), exampleMessage.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.method, HttpMethod.GET);
     }
 
     @Test
     public void parseUrl() {
-        var parser = new HttpMessageParser();
-        HttpMessage parsedMessage =  parser.parseMessage(exampleMessage);
+        var parser = new HttpRequestParser();
+        HttpRequest parsedMessage =  parser.parse(exampleMessage.getBytes(StandardCharsets.UTF_8), exampleMessage.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.url, "/lyrics-wizard");
     }
 
     @Test
     public void parseVersion() {
-        var parser = new HttpMessageParser();
-        HttpMessage parsedMessage = parser.parseMessage(exampleMessage);
+        var parser = new HttpRequestParser();
+        HttpRequest parsedMessage = parser.parse(exampleMessage.getBytes(StandardCharsets.UTF_8), exampleMessage.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.version, "HTTP/1.1");
     }

@@ -1,5 +1,6 @@
 package mono;
 
+import mono.http.HttpRequestParser;
 import mono.http.HttpResponseFactory;
 
 import java.io.BufferedInputStream;
@@ -12,6 +13,7 @@ import java.util.*;
 
 public class Jinn {
     private final Map<String, Endpoint> endpoints;
+    private final HttpRequestParser httpRequestParser = new HttpRequestParser();
 
     private Jinn(Map<String, Endpoint> endpoints) {
         this.endpoints = endpoints;
@@ -27,18 +29,19 @@ public class Jinn {
         while (true) {
             var s = socket.accept();
             System.out.printf("Socket accepted client at %s\n", s.getPort());
-            new Thread(() -> processClient(s)).start();
+
+            new Thread(() -> processRequest(s)).start();
         }
     }
 
-    private void processClient(Socket s) {
+    private void processRequest(Socket s) {
         try {
             System.out.printf("Trying to read on new socket - thread: %s\n", Thread.currentThread().getName());
             BufferedInputStream bufferedInputStream = new BufferedInputStream(s.getInputStream());
             byte[] bytes = new byte[4096];
             var bytesCount = bufferedInputStream.read(bytes);
-            var message = new String(Arrays.copyOfRange(bytes, 0, bytesCount));
-            System.out.printf("Read message:\n%s\n on socket %s\n", message, s.getPort());
+            var request = httpRequestParser.parse(bytes, bytesCount);
+            System.out.printf("Read message:\n%s\n on socket %s\n", request.version, s.getPort());
 
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream());
             bufferedOutputStream.write(HttpResponseFactory.getOkResponse().toString().getBytes());
