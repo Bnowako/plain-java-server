@@ -44,7 +44,7 @@ public class Jinn {
             System.out.printf("Read message:\n%s\n on socket %s\n", request.version, s.getPort());
 
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream());
-            bufferedOutputStream.write(HttpResponseFactory.getOkResponse().toString().getBytes());
+            bufferedOutputStream.write(HttpResponseFactory.getOkResponse(request.body.orElse("No body")).toString().getBytes());
             bufferedOutputStream.flush();
 
             s.close();

@@ -21,7 +21,7 @@ public class HttpRequestParser {
         boolean headersParsed = false;
         for (int i = 0; i < lines.size(); i++) {
             String currLine = lines.get(i);
-            if (!headersParsed && currLine.equals("")) {
+            if (!headersParsed && currLine.equals("\r")) {
                 headersParsed = true;
                 continue;
             }

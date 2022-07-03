@@ -15,18 +15,18 @@ import static mono.TestUtils.assertNotNull;
 public class HttpRequestParserTest {
 
     String getRequest = """
-            GET /lyrics-wizard HTTP/1.1
-            Host: 127.0.0.1:8080
-            User-Agent: test-agent
-            Accept: */*""";
+            GET /lyrics-wizard HTTP/1.1\r
+            Host: 127.0.0.1:8080\r
+            User-Agent: test-agent\r
+            Accept: */*\r""";
 
     String postRequest = """
-            POST /lyrics-wizard HTTP/1.1
-            Host: 127.0.0.1:8080
-            User-Agent: test-agent
-            Accept: */*
-
-            {"name": "quebonafide"}""";
+            POST /lyrics-wizard HTTP/1.1\r
+            Host: 127.0.0.1:8080\r
+            User-Agent: test-agent\r
+            Accept: */*\r
+            \r
+            {"name": "quebonafide"}\r""";
 
     public void test() {
         var methods = List.of(this.getClass().getDeclaredMethods());
