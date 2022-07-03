@@ -1,15 +1,18 @@
 package mono;
 
+import mono.http.HttpResponseFactory;
+import mono.http.HttpStatus;
+
 import java.util.Map;
 
 class UserEndpoint implements Endpoint {
 
     Wish createUser = (a) -> {
-        return a;
+        return HttpResponseFactory.createResponse("{\"id\": \"123\"}", HttpStatus.CREATED);
     };
 
     Wish getUser = (a) -> {
-        return a;
+        return HttpResponseFactory.createResponse("{\"user\": \"dummy\"}", HttpStatus.OK);
     };
 
     @Override

@@ -1,6 +1,7 @@
 package mono;
 
 import mono.http.HttpRequestParser;
+import mono.http.HttpResponse;
 import mono.http.HttpResponseFactory;
 
 import java.io.BufferedInputStream;
@@ -45,10 +46,10 @@ public class Jinn {
             var request = httpRequestParser.parse(bytes, bytesCount);
             System.out.printf("Read message:\n%s\n on socket %s\n", request.version(), s.getPort());
 
-            Object o = router.route(request, endpoints);
+            HttpResponse response = router.route(request, endpoints);
 
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream());
-            bufferedOutputStream.write(HttpResponseFactory.getOkResponse(o.toString()).toString().getBytes());
+            bufferedOutputStream.write(response.toString().getBytes());
             bufferedOutputStream.flush();
 
             s.close();

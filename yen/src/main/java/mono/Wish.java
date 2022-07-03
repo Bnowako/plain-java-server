@@ -1,7 +1,9 @@
 package mono;
 
 
+import mono.http.HttpResponse;
+
 public interface Wish {
-    Object fulfill(Object a);
+    HttpResponse fulfill(Object a);
 }
 

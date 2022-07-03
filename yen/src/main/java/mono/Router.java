@@ -1,13 +1,14 @@
 package mono;
 
 import mono.http.HttpRequest;
+import mono.http.HttpResponse;
 
 import java.util.List;
 import java.util.Map;
 
 public class Router {
 
-    public Object route(HttpRequest httpRequest, Map<String, Endpoint> endpoints) {
+    public HttpResponse route(HttpRequest httpRequest, Map<String, Endpoint> endpoints) {
         List<String> parts = getPathParts(httpRequest.path());
         Endpoint e = endpoints.get(parts.get(1));
         if(e == null) throw new IllegalArgumentException("Path does not exist");
