@@ -49,7 +49,7 @@ public class HttpRequestParserTest {
         var parser = new HttpRequestParser();
         HttpRequest parsedMessage =  parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
-        assertEquals(parsedMessage.method, HttpMethod.GET);
+        assertEquals(parsedMessage.method(), HttpMethod.GET);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class HttpRequestParserTest {
         var parser = new HttpRequestParser();
         HttpRequest parsedMessage =  parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
-        assertEquals(parsedMessage.path, "/lyrics-wizard");
+        assertEquals(parsedMessage.path(), "/lyrics-wizard");
     }
 
     @Test
@@ -65,7 +65,7 @@ public class HttpRequestParserTest {
         var parser = new HttpRequestParser();
         HttpRequest parsedMessage = parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
-        assertEquals(parsedMessage.version, "HTTP/1.1");
+        assertEquals(parsedMessage.version(), "HTTP/1.1");
     }
 
     @Test
@@ -73,9 +73,9 @@ public class HttpRequestParserTest {
         var parser = new HttpRequestParser();
         HttpRequest parsedMessage = parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
-        assertEquals(parsedMessage.headers.get("Host"), "127.0.0.1:8080");
-        assertEquals(parsedMessage.headers.get("User-Agent"), "test-agent");
-        assertEquals(parsedMessage.headers.get("Accept"), "*/*");
+        assertEquals(parsedMessage.headers().get("Host"), "127.0.0.1:8080");
+        assertEquals(parsedMessage.headers().get("User-Agent"), "test-agent");
+        assertEquals(parsedMessage.headers().get("Accept"), "*/*");
     }
 
     @Test
@@ -83,6 +83,6 @@ public class HttpRequestParserTest {
         var parser = new HttpRequestParser();
         HttpRequest parsedMessage = parser.parse(postRequest.getBytes(StandardCharsets.UTF_8), postRequest.length());
         assertNotNull(parsedMessage);
-        assertEquals(parsedMessage.body.orElse(""), "{\"name\": \"quebonafide\"}");
+        assertEquals(parsedMessage.body().orElse(""), "{\"name\": \"quebonafide\"}");
     }
 }
