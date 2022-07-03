@@ -10,11 +10,11 @@ public class HttpRequest {
     public final Map<String, String> headers;
     public final Optional<String> body;
 
-    public HttpRequest(String version, String url, HttpMethod method, Map<String, String> headers, String body) {
+    public HttpRequest(String version, String url, HttpMethod method, Map<String, String> headers, Optional<String> body) {
         this.version = version;
         this.url = url;
         this.method = method;
         this.headers = headers;
-        this.body = Optional.ofNullable(body);
+        this.body = body;
     }
 }

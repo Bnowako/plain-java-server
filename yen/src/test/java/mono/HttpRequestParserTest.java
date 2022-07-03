@@ -14,10 +14,19 @@ import static mono.TestUtils.assertNotNull;
 @TestClass
 public class HttpRequestParserTest {
 
-    String exampleMessage = "GET /lyrics-wizard HTTP/1.1\n" +
-            "Host: 127.0.0.1:8080\n" +
-            "User-Agent: curl/7.79.1\n" +
-            "Accept: */*";
+    String getRequest = """
+            GET /lyrics-wizard HTTP/1.1
+            Host: 127.0.0.1:8080
+            User-Agent: test-agent
+            Accept: */*""";
+
+    String postRequest = """
+            POST /lyrics-wizard HTTP/1.1
+            Host: 127.0.0.1:8080
+            User-Agent: test-agent
+            Accept: */*
+
+            {"name": "quebonafide"}""";
 
     public void test() {
         var methods = List.of(this.getClass().getDeclaredMethods());
@@ -38,7 +47,7 @@ public class HttpRequestParserTest {
     @Test
     public void parseMethod() {
         var parser = new HttpRequestParser();
-        HttpRequest parsedMessage =  parser.parse(exampleMessage.getBytes(StandardCharsets.UTF_8), exampleMessage.length());
+        HttpRequest parsedMessage =  parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.method, HttpMethod.GET);
     }
@@ -46,7 +55,7 @@ public class HttpRequestParserTest {
     @Test
     public void parseUrl() {
         var parser = new HttpRequestParser();
-        HttpRequest parsedMessage =  parser.parse(exampleMessage.getBytes(StandardCharsets.UTF_8), exampleMessage.length());
+        HttpRequest parsedMessage =  parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.url, "/lyrics-wizard");
     }
@@ -54,8 +63,26 @@ public class HttpRequestParserTest {
     @Test
     public void parseVersion() {
         var parser = new HttpRequestParser();
-        HttpRequest parsedMessage = parser.parse(exampleMessage.getBytes(StandardCharsets.UTF_8), exampleMessage.length());
+        HttpRequest parsedMessage = parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.version, "HTTP/1.1");
+    }
+
+    @Test
+    public void parseHeader() {
+        var parser = new HttpRequestParser();
+        HttpRequest parsedMessage = parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
+        assertNotNull(parsedMessage);
+        assertEquals(parsedMessage.headers.get("Host"), "127.0.0.1:8080");
+        assertEquals(parsedMessage.headers.get("User-Agent"), "test-agent");
+        assertEquals(parsedMessage.headers.get("Accept"), "*/*");
+    }
+
+    @Test
+    public void parseBody() {
+        var parser = new HttpRequestParser();
+        HttpRequest parsedMessage = parser.parse(postRequest.getBytes(StandardCharsets.UTF_8), postRequest.length());
+        assertNotNull(parsedMessage);
+        assertEquals(parsedMessage.body.orElse(""), "{\"name\": \"quebonafide\"}");
     }
 }
