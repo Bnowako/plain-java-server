@@ -1,11 +1,13 @@
 package mono;
 
+import mono.http.HttpMethod;
 import mono.http.HttpResponseFactory;
 import mono.http.HttpStatus;
 
+import java.util.List;
 import java.util.Map;
 
-class UserEndpoint implements Endpoint {
+class UserController implements Controller {
 
     Wish createUser = (a) -> {
         return HttpResponseFactory.createResponse("{\"id\": \"123\"}", HttpStatus.CREATED);
@@ -16,14 +18,11 @@ class UserEndpoint implements Endpoint {
     };
 
     @Override
-    public Map<String, Wish> getWishes() {
-        return Map.of("", getUser);
-    }
-
-    @Override
-    public Map<String, Wish> postWishes() {
-        return Map.of(
-                "", createUser
+    public List<Endpoint> endpoints() {
+        return List.of(
+                new Endpoint("", HttpMethod.GET, getUser),
+                new Endpoint("", HttpMethod.POST, createUser)
         );
     }
+
 }

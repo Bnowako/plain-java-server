@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Jinn jinn = Jinn.builder()
-                .register("user", new UserEndpoint())
+                .register("user", new UserController())
                 .build();
 
         jinn.makeAWish();

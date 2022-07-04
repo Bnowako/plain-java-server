@@ -2,7 +2,6 @@ package mono;
 
 import mono.http.HttpRequestParser;
 import mono.http.HttpResponse;
-import mono.http.HttpResponseFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,11 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Jinn {
-    private final Map<String, Endpoint> endpoints;
+    private final Map<String, Controller> endpoints;
     private final HttpRequestParser httpRequestParser = new HttpRequestParser();
     private final Router router = new Router();
 
-    private Jinn(Map<String, Endpoint> endpoints) {
+    private Jinn(Map<String, Controller> endpoints) {
         this.endpoints = endpoints;
     }
 
@@ -65,9 +64,9 @@ public class Jinn {
     }
 
     public static class Builder {
-        Map<String, Endpoint> endpoints = new HashMap<>();
+        Map<String, Controller> endpoints = new HashMap<>();
 
-        public Jinn.Builder register(String basePath, Endpoint endpoint) {
+        public Jinn.Builder register(String basePath, Controller endpoint) {
             endpoints.put(basePath, endpoint);
             return this;
         }
