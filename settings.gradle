@@ -1,4 +1,0 @@
-rootProject.name = 'monopol'
-include('yen')
-include('grass')
-include('example')
