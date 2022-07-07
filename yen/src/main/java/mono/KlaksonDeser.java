@@ -123,7 +123,7 @@ public class KlaksonDeser implements Deser {
                 } else if (currentFieldType.isRecord()) {
                     // if field is a record deserialize it recursively - passing i-1 to begin from '{')
                     var deserResult = deserialize(json, currentFieldType, i-1,level+1);
-                    i += deserResult.charsRead();
+                    i += deserResult.charsRead() - 1;
                     result.put(currentFieldName, deserResult.obj);
                     sb.setLength(0);
                     state = ParserState.BEFORE_FIELD_NAME;
