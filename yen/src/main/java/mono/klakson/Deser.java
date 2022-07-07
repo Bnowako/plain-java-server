@@ -40,7 +40,7 @@ class KlaksonDeser implements Deser {
     }
 
     enum ParserState {
-        START, BEFORE_FIELD_NAME, FIELD_NAME_START, FIELD_NAME_END, SEMICOLON, FIELD_START, FIELD_END;
+        START, BEFORE_FIELD_NAME, FIELD_NAME, AFTER_FIELD_NAME, BEFORE_FIELD_VALUE, FIELD_VALUE;
     }
 
     private Map<String, Object> parseString(String json, Field[] fields) {
@@ -54,76 +54,95 @@ class KlaksonDeser implements Deser {
 
         for (int i = 0; i < json.length(); i++) {
             char c = json.charAt(i);
-            // opening bracket
-            if (state == ParserState.START && c == '{') {
-                state = ParserState.BEFORE_FIELD_NAME;
-                continue;
-            }
 
-            // start of field name
-            if (state == ParserState.BEFORE_FIELD_NAME) {
-                if (c == '"') {
-                    state = ParserState.FIELD_NAME_START;
+            if (state == ParserState.START) {
+                if (c == '{') {
+                    state = ParserState.BEFORE_FIELD_NAME;
                 } else {
-                    // whitespace
-                    continue;
+                    throw new IllegalArgumentException(String.format("Json object must start with a '{' but got %s", c));
                 }
                 continue;
             }
 
-            // field name
-            if (state == ParserState.FIELD_NAME_START) {
-                if (c != '"') { //build field name
+            if (state == ParserState.BEFORE_FIELD_NAME) {
+                if (c == '"') {
+                    state = ParserState.FIELD_NAME;
+                }
+                continue;
+            }
+
+            if (state == ParserState.FIELD_NAME) {
+                if (c != '"') {
                     sb.append(c);
-                } else { // field name end
+                } else {
                     currentFieldName = sb.toString();
                     currentFieldType = fieldsByType.get(currentFieldName);
                     sb.setLength(0);
-                    state = ParserState.FIELD_NAME_END;
+                    state = ParserState.AFTER_FIELD_NAME;
                 }
                 continue;
             }
 
-            // semi colon
-            if (state == ParserState.FIELD_NAME_END) {
+            if (state == ParserState.AFTER_FIELD_NAME) {
                 if (c == ':') {
-                    state = ParserState.SEMICOLON;
-                } else {
-                    throw new IllegalStateException("Semicolon expected after field name");
+                    state = ParserState.BEFORE_FIELD_VALUE;
                 }
                 continue;
             }
 
-            if (state == ParserState.SEMICOLON) {
-                if (c == ' ') {
-                    continue;
-                } else {
-                    sb.append(c);
-                    state = ParserState.FIELD_START;
+            if (state == ParserState.BEFORE_FIELD_VALUE) {
+                if (c != ' ') {
+                    state = ParserState.FIELD_VALUE;
+                    if (currentFieldType == String.class) {
+                        if (c != '"') throw new IllegalArgumentException("String must begin with \"");
+                    } else {
+                        sb.append(c);
+                    }
                 }
                 continue;
             }
 
-            if (state == ParserState.FIELD_START) {
-                if (c == ',' || c == '\n') { // TODO: support for string
-                    //field value end
-                    state = ParserState.BEFORE_FIELD_NAME;
-                    String fieldValue = sb.toString();
-                    var res = parseValue(fieldValue, currentFieldType);
-                    result.put(currentFieldName, res);
-                    sb.setLength(0);
+            if (state == ParserState.FIELD_VALUE) {
+                if (currentFieldType == String.class) {
+                    if (c == '"' && json.charAt(i - 1) != '\\') {
+                        state = ParserState.BEFORE_FIELD_NAME;
+                        String value = sb.toString();
+                        result.put(currentFieldName, value);
+                        sb.setLength(0);
+                    }
+                    else {
+                        sb.append(c);
+                    }
                 } else {
-                    //build field value
-                    sb.append(c);
+                    if (c == ',' | c == '\n') {
+                        state = ParserState.BEFORE_FIELD_NAME;
+                        Object value = parseValue(sb.toString(), currentFieldType);
+                        result.put(currentFieldName, value);
+                        sb.setLength(0);
+                    } else {
+                        sb.append(c);
+                    }
                 }
+                continue;
             }
+
+
         }
         return result;
     }
 
+
     private Object parseValue(String rawFieldValue, Class<?> fieldType) {
         if (fieldType == Integer.TYPE) {
             return Integer.valueOf(rawFieldValue);
+        } else if (fieldType == Boolean.TYPE) {
+            return Boolean.valueOf(rawFieldValue);
+        } else if (fieldType == Long.TYPE) {
+            return Long.valueOf(rawFieldValue);
+        } else if (fieldType == Float.TYPE) {
+            return Float.valueOf(rawFieldValue);
+        } else if (fieldType == Double.TYPE) {
+            return Double.valueOf(rawFieldValue);
         } else {
             throw new IllegalStateException("Unsupported field type");
         }
