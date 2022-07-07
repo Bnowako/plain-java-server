@@ -4,34 +4,50 @@ import mono.Deser;
 import mono.KlaksonDeser;
 import mono.Test;
 import mono.TestClass;
+import mono.klakson.common.*;
 
 import java.util.Objects;
-
-record IntRecord(int x, int y) {
-}
-
-record BooleanRecord(boolean x, boolean y) {
-}
-
-record LongRecord(long x, long y) {
-}
-
-record DoubleRecord(double x, double y) {
-}
-
-record FloatRecord(float x, float y) {
-}
-
-record StringRecord(String x, String y) {
-}
-
-record MixedRecord(int i, boolean b, long l, double d, float f, String s) {
-}
 
 @TestClass
 public class DeserTest {
 
     Deser deser = new KlaksonDeser();
+//    @Test
+    public void deserializeDoubleNested() {
+        var json = """
+                {
+                  "x": 10,
+                  "nested": {
+                    "x": "hello",
+                    "nested": {
+                        "x": "hello",
+                        "y": "world"
+                        }
+                   }
+                }
+                """;
+
+        DoubleNestedRecord result = deser.deser(json, DoubleNestedRecord.class);
+
+        assert Objects.equals(result, new DoubleNestedRecord(10, new NestedRecord("hello", new StringRecord("hello", "world"))));
+    }
+
+    @Test
+    public void deserializeNested() {
+        var json = """
+                {
+                  "x": "hello world",
+                  "nested": {
+                    "x": "hello",
+                    "y": "world"
+                    }
+                }
+                """;
+
+        NestedRecord result = deser.deser(json, NestedRecord.class);
+
+        assert Objects.equals(result, new NestedRecord("hello world", new StringRecord("hello", "world")));
+    }
 
     @Test
     public void deserializeInt() {

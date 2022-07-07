@@ -12,23 +12,7 @@ import java.util.stream.Collectors;
 public class KlaksonDeser implements Deser {
     @Override
     public <T> T deser(String json, Class<T> clazz) {
-        Field[] fields = clazz.getDeclaredFields();
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        if (constructors.length != 1) {
-            throw new IllegalArgumentException("Class under deserialization must contain only one constructor");
-        }
-
-        Map<String, Object> fieldValues = parseString(json, fields);
-
-        Constructor<T> constructor = (Constructor<T>) constructors[0];
-        Parameter[] parameters = constructor.getParameters();
-        Object[] constructorParams = Arrays.stream(parameters).map(x -> fieldValues.get(x.getName())).toArray();
-
-        try {
-            return constructor.newInstance(constructorParams);
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return deserialize(json, clazz, 0,0).obj;
     }
 
     @Override
@@ -36,25 +20,49 @@ public class KlaksonDeser implements Deser {
         return null;
     }
 
+    private <T> DeserResult<T> deserialize(String json, Class<T> clazz, int start, int level) {
+        Field[] fields = clazz.getDeclaredFields();
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        if (constructors.length != 1) {
+            throw new IllegalArgumentException("Class under deserialization must contain only one constructor");
+        }
+
+        var fieldsDeserializationResult = getFields(json, fields, start, level);
+        var fieldValuesByName = fieldsDeserializationResult.fields;
+
+        Constructor<T> constructor = (Constructor<T>) constructors[0];
+        Parameter[] parameters = constructor.getParameters();
+        Object[] constructorParams = Arrays.stream(parameters).map(x -> fieldValuesByName.get(x.getName())).toArray();
+
+        try {
+            return new DeserResult<>(fieldsDeserializationResult.charsRead, constructor.newInstance(constructorParams));
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     enum ParserState {
         START, BEFORE_FIELD_NAME, FIELD_NAME, AFTER_FIELD_NAME, BEFORE_FIELD_VALUE, FIELD_VALUE;
     }
 
-    private Map<String, Object> parseString(String json, Field[] fields) {
+    private FieldDeserialization getFields(String json, Field[] fields, int start, int level) {
         Map<String, Class<?>> fieldsByType = Arrays.stream(fields).collect(Collectors.toMap(Field::getName, Field::getType));
         ParserState state = ParserState.START;
         StringBuilder sb = new StringBuilder();
         String currentFieldName = null;
         Class<?> currentFieldType = null;
         Map<String, Object> result = new HashMap<>();
+        int currLevel = level;
 
 
-        for (int i = 0; i < json.length(); i++) {
+        for (int i = start; i < json.length(); i++) {
             char c = json.charAt(i);
+            int charsRead = i - start;
 
             if (state == ParserState.START) {
                 if (c == '{') {
                     state = ParserState.BEFORE_FIELD_NAME;
+                    currLevel++;
                 } else {
                     throw new IllegalArgumentException(String.format("Json object must start with a '{' but got %s", c));
                 }
@@ -64,6 +72,8 @@ public class KlaksonDeser implements Deser {
             if (state == ParserState.BEFORE_FIELD_NAME) {
                 if (c == '"') {
                     state = ParserState.FIELD_NAME;
+                } else if (c == '}') {
+                    if (--currLevel == level) return new FieldDeserialization(charsRead, result);
                 }
                 continue;
             }
@@ -102,30 +112,40 @@ public class KlaksonDeser implements Deser {
             if (state == ParserState.FIELD_VALUE) {
                 if (currentFieldType == String.class) {
                     if (c == '"' && json.charAt(i - 1) != '\\') {
-                        state = ParserState.BEFORE_FIELD_NAME;
-                        String value = sb.toString();
-                        result.put(currentFieldName, value);
+                        // finish reading value if current character is unescaped quote
+                        result.put(currentFieldName, sb.toString());
                         sb.setLength(0);
+                        state = ParserState.BEFORE_FIELD_NAME;
                     } else {
+                        // build string value
                         sb.append(c);
                     }
+                } else if (currentFieldType.isRecord()) {
+                    // if field is a record deserialize it recursively - passing i-1 to begin from '{')
+                    var deserResult = deserialize(json, currentFieldType, i-1,level+1);
+                    i += deserResult.charsRead() - 1;
+                    result.put(currentFieldName, deserResult.obj);
+                    sb.setLength(0);
+                    state = ParserState.BEFORE_FIELD_NAME;
                 } else {
+                    // if field is not a string or a record it is considered finished when it's followed by comma, new line, or closing bracket
                     if (c == ',' || c == '\n' || c == '}') {
-                        state = ParserState.BEFORE_FIELD_NAME;
                         Object value = parseValue(sb.toString(), currentFieldType);
                         result.put(currentFieldName, value);
                         sb.setLength(0);
+                        state = ParserState.BEFORE_FIELD_NAME;
+                        if (c == '}' && --currLevel == level) return new FieldDeserialization(charsRead, result);
                     } else {
                         sb.append(c);
                     }
                 }
-                continue;
             }
-
-
         }
-        return result;
+        throw new IllegalStateException("Illegal deserialization state");
     }
+
+    record FieldDeserialization(int charsRead, Map<String, Object> fields) {}
+    record DeserResult<T>(int charsRead, T obj){}
 
 
     private Object parseValue(String rawFieldValue, Class<?> fieldType) {
