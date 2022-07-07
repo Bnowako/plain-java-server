@@ -1,5 +1,7 @@
 package mono.klakson;
 
+import mono.Deser;
+import mono.KlaksonDeser;
 import mono.Test;
 import mono.TestClass;
 

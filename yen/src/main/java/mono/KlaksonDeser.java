@@ -1,18 +1,15 @@
-package mono.klakson;
+package mono;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface Deser {
-    <T> T deser(String json, Class<T> clazz);
-
-    String ser(Object object);
-}
-
-class KlaksonDeser implements Deser {
+public class KlaksonDeser implements Deser {
     @Override
     public <T> T deser(String json, Class<T> clazz) {
         Field[] fields = clazz.getDeclaredFields();
@@ -109,12 +106,11 @@ class KlaksonDeser implements Deser {
                         String value = sb.toString();
                         result.put(currentFieldName, value);
                         sb.setLength(0);
-                    }
-                    else {
+                    } else {
                         sb.append(c);
                     }
                 } else {
-                    if (c == ',' | c == '\n') {
+                    if (c == ',' || c == '\n' || c == '}') {
                         state = ParserState.BEFORE_FIELD_NAME;
                         Object value = parseValue(sb.toString(), currentFieldType);
                         result.put(currentFieldName, value);

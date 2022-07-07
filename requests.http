@@ -1,0 +1,8 @@
+POST 127.0.0.1:8080/users
+Content-Type: application/json
+
+{
+  "name": "John",
+  "age": 45,
+  "married": true
+}
