@@ -57,7 +57,13 @@ public class HttpRequestParser {
     }
 
     private Map.Entry<String, String> parseHeader(String line) {
-        return Map.entry("a", "a");
+        int idx = line.indexOf(':');
+        String headerName = line.substring(0, idx);
+        // todo: review
+        // line.length - 1 -> get rid of \r -> can cause bugs
+        // idx + 2 -> get rid of ": " -> can cause bugs
+        String headerValue = line.substring(idx + 2, line.length() - 1);
+        return Map.entry(headerName, headerValue);
     }
 
     record FirstLine(HttpMethod method, String path, String version) {
