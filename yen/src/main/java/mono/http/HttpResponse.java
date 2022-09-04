@@ -25,15 +25,8 @@ public class HttpResponse {
     public String toString() {
         StringBuilder s = new StringBuilder(String.format("%s %s %s", this.version, this.status.code, this.status));
         if(this.body != null) {
-            s.append("\n");
             s.append(this.body);
         }
-        headers.keySet()
-                .forEach(k -> {
-                    String header = String.format("\n%s: %s", k, this.headers.get(k));
-                    s.append(header);
-                });
-
         return s.toString();
     }
 }
