@@ -6,13 +6,14 @@ import mono.Test;
 import mono.TestClass;
 import mono.klakson.common.*;
 
-import java.util.Objects;
+import static mono.TestUtils.assertEquals;
 
 @TestClass
 public class DeserTest {
 
     Deser deser = new KlaksonDeser();
-//    @Test
+
+    @Test
     public void deserializeDoubleNested() {
         var json = """
                 {
@@ -28,8 +29,7 @@ public class DeserTest {
                 """;
 
         DoubleNestedRecord result = deser.deser(json, DoubleNestedRecord.class);
-
-        assert Objects.equals(result, new DoubleNestedRecord(10, new NestedRecord("hello", new StringRecord("hello", "world"))));
+        assertEquals(result, new DoubleNestedRecord(10, new NestedRecord("hello", new StringRecord("hello", "world"))));
     }
 
     @Test
@@ -45,8 +45,7 @@ public class DeserTest {
                 """;
 
         NestedRecord result = deser.deser(json, NestedRecord.class);
-
-        assert Objects.equals(result, new NestedRecord("hello world", new StringRecord("hello", "world")));
+        assertEquals(result, new NestedRecord("hello world", new StringRecord("hello", "world")));
     }
 
     @Test
@@ -60,7 +59,7 @@ public class DeserTest {
 
         IntRecord result = deser.deser(json, IntRecord.class);
 
-        assert Objects.equals(result, new IntRecord(10, -2));
+        assertEquals(result, new IntRecord(10, -2));
     }
 
     @Test
@@ -74,7 +73,7 @@ public class DeserTest {
 
         BooleanRecord result = deser.deser(json, BooleanRecord.class);
 
-        assert Objects.equals(result, new BooleanRecord(true, false));
+        assertEquals(result, new BooleanRecord(true, false));
     }
 
     @Test
@@ -88,7 +87,7 @@ public class DeserTest {
 
         LongRecord result = deser.deser(json, LongRecord.class);
 
-        assert Objects.equals(result, new LongRecord(32040202L, -83274292L));
+        assertEquals(result, new LongRecord(32040202L, -83274292L));
     }
 
     @Test
@@ -102,7 +101,7 @@ public class DeserTest {
 
         DoubleRecord result = deser.deser(json, DoubleRecord.class);
 
-        assert Objects.equals(result, new DoubleRecord(32.01d, -16.09d));
+        assertEquals(result, new DoubleRecord(32.01d, -16.09d));
     }
 
     @Test
@@ -116,7 +115,7 @@ public class DeserTest {
 
         FloatRecord result = deser.deser(json, FloatRecord.class);
 
-        assert Objects.equals(result, new FloatRecord(32.01f, -16.09f));
+        assertEquals(result, new FloatRecord(32.01f, -16.09f));
     }
 
     @Test
@@ -130,7 +129,7 @@ public class DeserTest {
 
         StringRecord result = deser.deser(json, StringRecord.class);
 
-        assert Objects.equals(result, new StringRecord("ala ma kota", "zbigniew ma psa \n \\\" i kota"));
+        assertEquals(result, new StringRecord("ala ma kota", "zbigniew ma psa \n \\\" i kota"));
     }
 
     @Test
@@ -148,7 +147,7 @@ public class DeserTest {
 
         MixedRecord result = deser.deser(json, MixedRecord.class);
 
-        assert Objects.equals(result, new MixedRecord(10, true, 2450L, 0.1d, 0.2f, "hello world"));
+        assertEquals(result, new MixedRecord(10, true, 2450L, 0.1d, 0.2f, "hello world"));
     }
 
 
