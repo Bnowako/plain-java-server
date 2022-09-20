@@ -23,7 +23,13 @@ public class HttpResponse {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder(String.format("%s %s %s", this.version, this.status.code, this.status));
+        StringBuilder s = new StringBuilder(String.format("%s %s %s\n", this.version, this.status.code, this.status));
+        headers.keySet()
+                .forEach(k -> {
+                    String header = String.format("%s: %s\r\n", k, this.headers.get(k));
+                    s.append(header);
+                });
+        s.append("\r\n");
         if(this.body != null) {
             s.append(this.body);
         }

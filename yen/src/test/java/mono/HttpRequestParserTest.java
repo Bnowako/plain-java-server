@@ -1,8 +1,8 @@
 package mono;
 
+import mono.http.HttpMethod;
 import mono.http.HttpRequest;
 import mono.http.HttpRequestParser;
-import mono.http.HttpMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +28,19 @@ public class HttpRequestParserTest {
             \r
             {"name": "quebonafide"}\r""";
 
+    String multilinePostRequest = """
+            POST /lyrics-wizard HTTP/1.1\r
+            Host: 127.0.0.1:8080\r
+            User-Agent: test-agent\r
+            Accept: */*\r
+            \r
+            {\r
+            "name": "asd",\r
+            "age": 4,\r
+            "married": true\r
+            }\r""";
+
+
     public void test() {
         var methods = List.of(this.getClass().getDeclaredMethods());
         methods.stream().filter(m -> m.isAnnotationPresent(Test.class))
@@ -47,7 +60,7 @@ public class HttpRequestParserTest {
     @Test
     public void parseMethod() {
         var parser = new HttpRequestParser();
-        HttpRequest parsedMessage =  parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
+        HttpRequest parsedMessage = parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.method(), HttpMethod.GET);
     }
@@ -55,7 +68,7 @@ public class HttpRequestParserTest {
     @Test
     public void parseUrl() {
         var parser = new HttpRequestParser();
-        HttpRequest parsedMessage =  parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
+        HttpRequest parsedMessage = parser.parse(getRequest.getBytes(StandardCharsets.UTF_8), getRequest.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.path(), "/lyrics-wizard");
     }
@@ -84,5 +97,19 @@ public class HttpRequestParserTest {
         HttpRequest parsedMessage = parser.parse(postRequest.getBytes(StandardCharsets.UTF_8), postRequest.length());
         assertNotNull(parsedMessage);
         assertEquals(parsedMessage.body().orElse(""), "{\"name\": \"quebonafide\"}");
+    }
+
+    @Test
+    public void parseMultiLineBody() {
+        var parser = new HttpRequestParser();
+        HttpRequest parsedMessage = parser.parse(multilinePostRequest.getBytes(StandardCharsets.UTF_8), postRequest.length());
+        assertNotNull(parsedMessage);
+        assertEquals(parsedMessage.body().orElse(""), """
+                {
+                            "name": "asd",
+                            "age": 4,
+                            "married": true
+                            }
+                """);
     }
 }

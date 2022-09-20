@@ -11,6 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Jinn {
     private final Map<String, Controller> endpoints;
@@ -27,12 +29,11 @@ public class Jinn {
 
     public void makeAWish() throws IOException {
         ServerSocket socket = initSocket();
-
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
         while (true) {
             var s = socket.accept();
             System.out.printf("Socket accepted client at %s\n", s.getPort());
-
-            new Thread(() -> processRequest(s)).start();
+            executorService.submit(() -> processRequest(s));
         }
     }
 
