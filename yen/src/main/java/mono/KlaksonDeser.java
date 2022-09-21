@@ -1,9 +1,6 @@
 package mono;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +9,7 @@ import java.util.stream.Collectors;
 public class KlaksonDeser implements Deser {
     @Override
     public <T> T deser(String json, Class<T> clazz) {
-        return deserialize(json, clazz, 0,0).obj;
+        return deserialize(json, clazz, 0, 0).obj;
     }
 
     @Override
@@ -35,6 +32,7 @@ public class KlaksonDeser implements Deser {
         Object[] constructorParams = Arrays.stream(parameters).map(x -> fieldValuesByName.get(x.getName())).toArray();
 
         try {
+            constructor.setAccessible(true);
             return new DeserResult<>(fieldsDeserializationResult.charsRead, constructor.newInstance(constructorParams));
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -122,7 +120,7 @@ public class KlaksonDeser implements Deser {
                     }
                 } else if (currentFieldType.isRecord()) {
                     // if field is a record deserialize it recursively - passing i-1 to begin from '{')
-                    var deserResult = deserialize(json, currentFieldType, i-1,level+1);
+                    var deserResult = deserialize(json, currentFieldType, i - 1, level + 1);
                     i += deserResult.charsRead() - 1;
                     result.put(currentFieldName, deserResult.obj);
                     sb.setLength(0);
@@ -145,7 +143,7 @@ public class KlaksonDeser implements Deser {
     }
 
     record FieldDeserialization(int charsRead, Map<String, Object> fields) {}
-    record DeserResult<T>(int charsRead, T obj){}
+    record DeserResult<T>(int charsRead, T obj) {}
 
 
     private Object parseValue(String rawFieldValue, Class<?> fieldType) {
