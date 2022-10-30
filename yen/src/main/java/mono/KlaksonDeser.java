@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 public class KlaksonDeser implements Deser {
 
-    private static final String START_OF_OBJECT = "{\n";
-    private static final String END_OF_OBJECT = "\n}\n";
-    private static final String FIELD_NAME = "  \"%s\": ";
-    private static final String END_OF_FIELD = ",\n";
+    private static final String START_OF_OBJECT = "{";
+    private static final String END_OF_OBJECT = "}";
+    private static final String FIELD_NAME = "\"%s\":";
+    private static final String END_OF_FIELD = ",";
 
 
     @Override
@@ -29,14 +29,13 @@ public class KlaksonDeser implements Deser {
 
     private String serialize(Object object) {
         try {
-            return serializeObject(new StringBuilder(""), object);
+            return serializeObject(new StringBuilder(""), object, 0);
         } catch (Throwable e) {
             throw new RuntimeException();
         }
     }
 
-    private String serializeObject(StringBuilder json, Object object) throws IllegalAccessException {
-
+    private String serializeObject(StringBuilder json, Object object, int level) throws IllegalAccessException {
         json.append(START_OF_OBJECT);
         Field[] allFields = object.getClass().getDeclaredFields();
         for (int i = 0; i < allFields.length; i++) {
@@ -47,6 +46,9 @@ public class KlaksonDeser implements Deser {
                 json.append(currField.get(object).toString());
             } else if (currField.getType().equals(String.class)) {
                 json.append("\"%s\"".formatted(currField.get(object).toString()));
+            } else {
+                String serializedObject = serializeObject(new StringBuilder(""), currField.get(object), level + 1);
+                json.append(serializedObject);
             }
             if (i < allFields.length - 1) {
                 json.append(END_OF_FIELD);

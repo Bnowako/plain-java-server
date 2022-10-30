@@ -195,7 +195,8 @@ public class DeserTest {
                   "y": -2
                 }
                 """;
-        assertEquals(result, expected);
+        assertEquals(result, expected.replaceAll("\s+","").replaceAll("\n", ""));
+
     }
 
     @Test
@@ -208,7 +209,7 @@ public class DeserTest {
                   "y": false
                 }
                 """;
-        assertEquals(result, expected);
+        assertEquals(result, expected.replaceAll("\s+","").replaceAll("\n", ""));
     }
 
     @Test
@@ -221,7 +222,7 @@ public class DeserTest {
                   "y": -83274292
                 }
                 """;
-        assertEquals(result, expected);
+        assertEquals(result, expected.replaceAll("\s+","").replaceAll("\n", ""));
     }
 
     @Test
@@ -234,7 +235,7 @@ public class DeserTest {
                   "y": -16.09
                 }
                 """;
-        assertEquals(result, expected);
+        assertEquals(result, expected.replaceAll("\s+","").replaceAll("\n", ""));
     }
 
     @Test
@@ -247,7 +248,7 @@ public class DeserTest {
                   "y": -16.09
                 }
                 """;
-        assertEquals(result,expected);
+        assertEquals(result, expected.replaceAll("\s+","").replaceAll("\n", ""));
     }
 
     @Test
@@ -255,11 +256,7 @@ public class DeserTest {
         String result = deser.ser(new StringRecord("ala ma kota", "zbigniew ma psa \n \\\" i kota"));
 
         var expected = """
-                {
-                  "x": "ala ma kota",
-                  "y": "zbigniew ma psa \n \\" i kota"
-                }
-                """;
+                {"x":"ala ma kota","y":"zbigniew ma psa \n \\" i kota"}""";
         assertEquals(result, expected);
     }
 
@@ -268,16 +265,25 @@ public class DeserTest {
         String result = deser.ser(new MixedRecord(10, true, 2450L, 0.1d, 0.2f, "hello world"));
 
         var expected = """
-                {
-                  "i": 10,
-                  "b": true,
-                  "l": 2450,
-                  "d": 0.1,
-                  "f": 0.2,
-                  "s": "hello world"
-                }
-                """;
+                {"i":10,"b":true,"l":2450,"d":0.1,"f":0.2,"s":"hello world"}""";
         assertEquals(result, expected);
     }
 
+    @Test
+    public void serializeNested() {
+        String result = deser.ser(new NestedRecord("hello world", new StringRecord("hello", "world")));
+
+        var expected = """
+                {"x":"hello world","nested":{"x":"hello","y":"world"}}""";
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void serializeDoubleNested() {
+        String result = deser.ser(new DoubleNestedRecord(10, new NestedRecord("hello", new StringRecord("hello", "world"))));
+
+        var expected = """
+                {"x":10,"nested":{"x":"hello","nested":{"x":"hello","y":"world"}}}""";
+        assertEquals(result, expected);
+    }
 }
