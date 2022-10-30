@@ -1,19 +1,17 @@
 package mono;
 
 import mono.http.HttpMethod;
-import mono.http.HttpResponseFactory;
-import mono.http.HttpStatus;
 
 import java.util.List;
 
 class UserController implements Controller {
 
     Wish createUser() {
-        return (httpRequest, deserBody) -> HttpResponseFactory.createResponse("{\"id\": \"123\"}", HttpStatus.CREATED);
+        return (httpRequest, deserBody) -> deserBody;
     }
 
     Wish getUser() {
-        return (httpRequest, deserBody) -> HttpResponseFactory.createResponse("{\"user\": \"dummy\"}", HttpStatus.OK);
+        return (httpRequest, deserBody) -> new User("Henry", 303, new Address("już nie rivia", "costam"));
     }
 
     @Override

@@ -2,6 +2,8 @@ package mono;
 
 import mono.http.HttpRequest;
 import mono.http.HttpResponse;
+import mono.http.HttpResponseFactory;
+import mono.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,8 @@ public class Router {
             System.out.printf("Deser done! body: %s%n", deserBody.toString());
         }
 
-        return endpoint.wish().fulfill(httpRequest, deserBody);
+        Object fulfilledWish = endpoint.wish().fulfill(httpRequest, deserBody);
+        return HttpResponseFactory.createResponse(deser.ser(fulfilledWish), HttpStatus.OK);
     }
 
     private List<String> getPathParts(String path) {
