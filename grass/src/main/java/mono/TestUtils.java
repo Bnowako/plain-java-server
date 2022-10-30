@@ -1,7 +1,6 @@
 package mono;
 
 import java.util.Objects;
-import java.util.concurrent.Callable;
 
 public class TestUtils {
     public static void assertNotNull(Object object) {
