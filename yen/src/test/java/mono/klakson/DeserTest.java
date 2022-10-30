@@ -165,7 +165,7 @@ public class DeserTest {
 
         User result = deser.deser(json, User.class);
 
-        assertEquals(result.name(), User.withAddress("Pavetta", 22, "Cintra", "Rynkowa"));
+        assertEquals(result, User.withAddress("Pavetta", 22, "Cintra", "Rynkowa"));
     }
 
 
