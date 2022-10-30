@@ -10,6 +10,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class KlaksonDeser implements Deser {
+
+    private static final String START_OF_OBJECT = "{\n";
+    private static final String END_OF_OBJECT = "\n}\n";
+    private static final String FIELD_NAME = "  \"%s\": ";
+    private static final String END_OF_FIELD = ",\n";
+
+
     @Override
     public <T> T deser(String json, Class<T> clazz) {
         return deserialize(json, clazz, 0, 0).obj;
@@ -29,21 +36,23 @@ public class KlaksonDeser implements Deser {
     }
 
     private String serializeObject(StringBuilder json, Object object) throws IllegalAccessException {
-        json.append("{\n");
+
+        json.append(START_OF_OBJECT);
         Field[] allFields = object.getClass().getDeclaredFields();
         for (int i = 0; i < allFields.length; i++) {
             Field currField = allFields[i];
             currField.setAccessible(true);
+            json.append(FIELD_NAME.formatted(currField.getName()));
             if (ClassUtils.isPrimitiveOrWrapper(currField.getType())) {
-                json.append("  \"%s\": %s".formatted(currField.getName(), currField.get(object).toString()));
+                json.append(currField.get(object).toString());
             } else if (currField.getType().equals(String.class)) {
-                json.append("  \"%s\": \"%s\"".formatted(currField.getName(), currField.get(object).toString()));
+                json.append("\"%s\"".formatted(currField.get(object).toString()));
             }
             if (i < allFields.length - 1) {
-                json.append(",\n");
+                json.append(END_OF_FIELD);
             }
         }
-        json.append("\n}\n");
+        json.append(END_OF_OBJECT);
         return json.toString();
     }
 
