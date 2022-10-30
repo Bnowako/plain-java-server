@@ -82,6 +82,7 @@ public class KlaksonDeser implements Deser {
                 } else {
                     currentFieldName = sb.toString();
                     currentFieldType = fieldsByType.get(currentFieldName);
+                    if(currentFieldType == null ) throw new IllegalArgumentException("No field with name %s".formatted(currentFieldName));
                     sb.setLength(0);
                     state = ParserState.AFTER_FIELD_NAME;
                 }

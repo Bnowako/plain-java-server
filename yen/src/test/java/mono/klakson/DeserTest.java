@@ -7,6 +7,7 @@ import mono.TestClass;
 import mono.klakson.common.*;
 
 import static mono.TestUtils.assertEquals;
+import static mono.TestUtils.assertThrows;
 
 @TestClass
 public class DeserTest {
@@ -168,5 +169,20 @@ public class DeserTest {
         assertEquals(result, User.withAddress("Pavetta", 22, "Cintra", "Rynkowa"));
     }
 
+    @Test
+    public void fieldNameDoesNotMatch() throws NoSuchFieldException {
+        var json = """
+                {
+                  "nameTypo:(": "Pavetta",
+                  "age": 22,
+                  "address": {
+                   "city": "Cintra",
+                   "street": "Rynkowa"
+                  }
+                }
+                """;
+
+        assertThrows(() -> deser.deser(json, User.class), IllegalArgumentException.class);
+    }
 
 }
