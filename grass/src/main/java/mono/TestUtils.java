@@ -1,6 +1,7 @@
 package mono;
 
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 public class TestUtils {
     public static void assertNotNull(Object object) {
@@ -12,4 +13,15 @@ public class TestUtils {
         assert !Objects.isNull(actual) : "FAILED Actual: is null";
         assert expected.equals(actual) : String.format("Expected: %s, Actual: %s", expected.toString(), actual.toString());
     }
+
+    public static void assertThrows(ExecMe execMe, Class<?> exceptionClass) {
+        try {
+            execMe.execute();
+        } catch (Throwable e) {
+            assert e.getClass().equals(exceptionClass) : "FAILED Function thrown another exception: %s".formatted(e.getClass().toString());
+            return;
+        }
+        assert false : "Function did not throw %s".formatted(exceptionClass.toString());
+    }
 }
+
