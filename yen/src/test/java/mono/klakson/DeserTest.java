@@ -185,4 +185,99 @@ public class DeserTest {
         assertThrows(() -> deser.deser(json, User.class), IllegalArgumentException.class);
     }
 
+    @Test
+    public void serializeInt() {
+        String result = deser.ser(new IntRecord(10, -2));
+
+        var expected = """
+                {
+                  "x": 10,
+                  "y": -2
+                }
+                """;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void serializeBoolean() {
+        String result = deser.ser(new BooleanRecord(true, false));
+
+        var expected = """
+                {
+                  "x": true,
+                  "y": false
+                }
+                """;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void serializeLong() {
+        String result = deser.ser(new LongRecord(32040202L, -83274292L));
+
+        var expected = """
+                {
+                  "x": 32040202,
+                  "y": -83274292
+                }
+                """;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void serializeDouble() {
+        String result = deser.ser(new DoubleRecord(32.01d, -16.09d));
+
+        var expected = """
+                {
+                  "x": 32.01,
+                  "y": -16.09
+                }
+                """;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void serializeFloat() {
+        String result = deser.ser(new FloatRecord(32.01f, -16.09f));
+
+        var expected = """
+                {
+                  "x": 32.01,
+                  "y": -16.09
+                }
+                """;
+        assertEquals(result,expected);
+    }
+
+    @Test
+    public void serializeString() {
+        String result = deser.ser(new StringRecord("ala ma kota", "zbigniew ma psa \n \\\" i kota"));
+
+        var expected = """
+                {
+                  "x": "ala ma kota",
+                  "y": "zbigniew ma psa \n \\" i kota"
+                }
+                """;
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void serializeMixed() {
+        String result = deser.ser(new MixedRecord(10, true, 2450L, 0.1d, 0.2f, "hello world"));
+
+        var expected = """
+                {
+                  "i": 10,
+                  "b": true,
+                  "l": 2450,
+                  "d": 0.1,
+                  "f": 0.2,
+                  "s": "hello world"
+                }
+                """;
+        assertEquals(result, expected);
+    }
+
 }

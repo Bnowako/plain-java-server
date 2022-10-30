@@ -17,7 +17,34 @@ public class KlaksonDeser implements Deser {
 
     @Override
     public String ser(Object object) {
-        return null;
+        return serialize(object);
+    }
+
+    private String serialize(Object object) {
+        try {
+            return serializeObject(new StringBuilder(""), object);
+        } catch (Throwable e) {
+            throw new RuntimeException();
+        }
+    }
+
+    private String serializeObject(StringBuilder json, Object object) throws IllegalAccessException {
+        json.append("{\n");
+        Field[] allFields = object.getClass().getDeclaredFields();
+        for (int i = 0; i < allFields.length; i++) {
+            Field currField = allFields[i];
+            currField.setAccessible(true);
+            if (ClassUtils.isPrimitiveOrWrapper(currField.getType())) {
+                json.append("  \"%s\": %s".formatted(currField.getName(), currField.get(object).toString()));
+            } else if (currField.getType().equals(String.class)) {
+                json.append("  \"%s\": \"%s\"".formatted(currField.getName(), currField.get(object).toString()));
+            }
+            if (i < allFields.length - 1) {
+                json.append(",\n");
+            }
+        }
+        json.append("\n}\n");
+        return json.toString();
     }
 
     private <T> DeserResult<T> deserialize(String json, Class<T> clazz, int start, int level) {
@@ -85,7 +112,8 @@ public class KlaksonDeser implements Deser {
                 } else {
                     currentFieldName = sb.toString();
                     currentFieldType = fieldsByType.get(currentFieldName);
-                    if(currentFieldType == null ) throw new IllegalArgumentException("No field with name %s".formatted(currentFieldName));
+                    if (currentFieldType == null)
+                        throw new IllegalArgumentException("No field with name %s".formatted(currentFieldName));
                     sb.setLength(0);
                     state = ParserState.AFTER_FIELD_NAME;
                 }
@@ -146,8 +174,11 @@ public class KlaksonDeser implements Deser {
         throw new IllegalStateException("Illegal deserialization state");
     }
 
-    record FieldDeserialization(int charsRead, Map<String, Object> fields) {}
-    record DeserResult<T>(int charsRead, T obj) {}
+    record FieldDeserialization(int charsRead, Map<String, Object> fields) {
+    }
+
+    record DeserResult<T>(int charsRead, T obj) {
+    }
 
 
     private Object parseValue(String rawFieldValue, Class<?> fieldType) {
