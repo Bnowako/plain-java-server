@@ -150,5 +150,23 @@ public class DeserTest {
         assertEquals(result, new MixedRecord(10, true, 2450L, 0.1d, 0.2f, "hello world"));
     }
 
+    @Test
+    public void deserializeNonPublicNestedClass() throws NoSuchFieldException {
+        var json = """
+                {
+                  "name": "Pavetta",
+                  "age": 22,
+                  "address": {
+                   "city": "Cintra",
+                   "street": "Rynkowa"
+                  }
+                }
+                """;
+
+        User result = deser.deser(json, User.class);
+
+        assertEquals(result.name(), User.withAddress("Pavetta", 22, "Cintra", "Rynkowa"));
+    }
+
 
 }
